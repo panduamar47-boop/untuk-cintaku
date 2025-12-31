@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Pesan Untukmu</title>
 
 <style>
@@ -34,6 +34,7 @@ body {
     justify-content:center;
     padding:25px;
     text-align:center;
+    position:relative;
 }
 
 .img-box {
@@ -56,8 +57,14 @@ body {
     margin:20px 0;
 }
 
-button {
+.btn-group {
     width:100%;
+    display:flex;
+    gap:10px;
+}
+
+button {
+    flex:1;
     padding:14px;
     border:none;
     border-radius:50px;
@@ -66,6 +73,10 @@ button {
     font-weight:bold;
     font-size:16px;
     cursor:pointer;
+}
+
+button.back {
+    background:#f3b6c5;
 }
 
 button:disabled {
@@ -97,30 +108,41 @@ button:disabled {
 <body>
 
 <audio id="musik" loop>
-    <source src="musik/lagu.mp3" type="audio/mpeg">
+    <source src="lagu.mp3" type="audio/mpeg">
 </audio>
 
 <div class="container">
     <div class="img-box">
-        <img id="gambar" src="img/01.png">
+        <img id="gambar" src="01.png">
     </div>
 
     <div id="teks"></div>
 
-    <button id="btn">Mulai ❤️</button>
+    <div class="btn-group">
+        <button class="back" id="back">← Back</button>
+        <button id="btn">Mulai ❤️</button>
+    </div>
+
     <div id="hal"></div>
 </div>
 
 <script>
+/* ================== SET WA DI SINI ================== */
+const waLink = "https://wa.me/628XXXXXXXXXX?text=aku%20udah%20baca%20semuanya%20🤍";
+/* =================================================== */
+
 const musik = document.getElementById("musik");
 const teks = document.getElementById("teks");
 const btn = document.getElementById("btn");
+const back = document.getElementById("back");
 const hal = document.getElementById("hal");
 const img = document.getElementById("gambar");
 
-let n = 0;
+let n = -1;
 let i = 0;
 let sedangMengetik = false;
+
+const pembuka = "baca ini dulu sampe abis ya sayang, baru bales di WA 🤍";
 
 const pesan = [
 "hallo sayaanggkuu... akuu mau mintaa maaff bangett soalnya tadi, maaf klo ada kata² yang kurang enak, aku lagii bingung lagi kacau fikiranku...",
@@ -141,48 +163,90 @@ const pesan = [
 ];
 
 const imgs = [
-"img/01.png","img/02.png","img/03.png","img/04.png","img/05.png",
-"img/06.png","img/07.png","img/08.png","img/09.png","img/10.png",
-"img/11.png","img/12.png","img/13.png","img/14.png","img/15.png"
+"01.png","02.png","03.png","04.png","05.png",
+"06.png","07.png","08.png","09.png","10.png",
+"11.png","12.png","13.png","14.png","15.png"
 ];
 
-function ketik() {
+function ketik(teksIsi, selesai) {
     sedangMengetik = true;
     btn.disabled = true;
+    teks.innerHTML = "";
+    i = 0;
 
-    if (i < pesan[n].length) {
-        teks.innerHTML += pesan[n].charAt(i);
-        i++;
-        setTimeout(ketik, 35);
-    } else {
-        sedangMengetik = false;
-        btn.disabled = false;
-        n++; // NAIK SETELAH SELESAI NGETIK
-        if (n === pesan.length) btn.innerHTML = "Selesai ❤️";
+    function jalan() {
+        if (i < teksIsi.length) {
+            teks.innerHTML += teksIsi.charAt(i);
+            i++;
+            setTimeout(jalan, 35);
+        } else {
+            sedangMengetik = false;
+            btn.disabled = false;
+            if (selesai) selesai();
+        }
     }
+    jalan();
 }
 
+/* ===== PEMBUKA ===== */
+ketik(pembuka);
+btn.innerHTML = "Mulai ❤️";
+back.disabled = true;
+
+/* ===== BUTTON NEXT ===== */
 btn.onclick = () => {
     if (sedangMengetik) return;
 
-    if (n === 0) {
+    /* END -> WA */
+    if (btn.innerHTML.includes("WhatsApp")) {
+        let v = musik.volume;
+        const fadeOut = setInterval(() => {
+            v -= 0.05;
+            musik.volume = Math.max(v, 0);
+            if (v <= 0) {
+                clearInterval(fadeOut);
+                window.location.href = waLink;
+            }
+        }, 120);
+        return;
+    }
+
+    if (n === -1) {
         musik.volume = 0;
         musik.play();
         let v = 0;
-        const fade = setInterval(() => {
+        const fadeIn = setInterval(() => {
             v += 0.02;
             musik.volume = Math.min(v, 1);
-            if (v >= 1) clearInterval(fade);
+            if (v >= 1) clearInterval(fadeIn);
         }, 100);
     }
 
-    teks.innerHTML = "";
-    i = 0;
+    n++;
     img.src = imgs[n];
     hal.innerHTML = (n + 1) + " / " + pesan.length;
-    ketik();
+    back.disabled = false;
+
+    ketik(pesan[n], () => {
+        if (n === pesan.length - 1) {
+            btn.innerHTML = "Balas di WhatsApp 💬";
+        } else {
+            btn.innerHTML = "Lanjut →";
+        }
+    });
 };
 
+/* ===== BUTTON BACK ===== */
+back.onclick = () => {
+    if (sedangMengetik || n <= 0) return;
+    n--;
+    img.src = imgs[n];
+    hal.innerHTML = (n + 1) + " / " + pesan.length;
+    teks.innerHTML = pesan[n];
+    btn.innerHTML = "Lanjut →";
+};
+
+/* ===== HEART EFFECT ===== */
 setInterval(() => {
     const h = document.createElement("div");
     h.className = "heart";
