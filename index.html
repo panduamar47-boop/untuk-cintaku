@@ -108,12 +108,12 @@ button:disabled {
 <body>
 
 <audio id="musik" loop>
-    <source src="lagu.mp3" type="audio/mpeg">
+    <source src="musik/lagu.mp3" type="audio/mpeg">
 </audio>
 
 <div class="container">
     <div class="img-box">
-        <img id="gambar" src="01.png">
+        <img id="gambar" src="img/01.png">
     </div>
 
     <div id="teks"></div>
@@ -127,9 +127,7 @@ button:disabled {
 </div>
 
 <script>
-/* ================== SET WA DI SINI ================== */
 const waLink = "https://wa.me/628XXXXXXXXXX?text=aku%20udah%20baca%20semuanya%20🤍";
-/* =================================================== */
 
 const musik = document.getElementById("musik");
 const teks = document.getElementById("teks");
@@ -163,9 +161,9 @@ const pesan = [
 ];
 
 const imgs = [
-"01.png","02.png","03.png","04.png","05.png",
-"06.png","07.png","08.png","09.png","10.png",
-"11.png","12.png","13.png","14.png","15.png"
+"img/01.png","img/02.png","img/03.png","img/04.png","img/05.png",
+"img/06.png","img/07.png","img/08.png","img/09.png","img/10.png",
+"img/11.png","img/12.png","img/13.png","img/14.png","img/15.png"
 ];
 
 function ketik(teksIsi, selesai) {
@@ -188,16 +186,12 @@ function ketik(teksIsi, selesai) {
     jalan();
 }
 
-/* ===== PEMBUKA ===== */
 ketik(pembuka);
-btn.innerHTML = "Mulai ❤️";
 back.disabled = true;
 
-/* ===== BUTTON NEXT ===== */
 btn.onclick = () => {
     if (sedangMengetik) return;
 
-    /* END -> WA */
     if (btn.innerHTML.includes("WhatsApp")) {
         let v = musik.volume;
         const fadeOut = setInterval(() => {
@@ -228,15 +222,12 @@ btn.onclick = () => {
     back.disabled = false;
 
     ketik(pesan[n], () => {
-        if (n === pesan.length - 1) {
-            btn.innerHTML = "Balas di WhatsApp 💬";
-        } else {
-            btn.innerHTML = "Lanjut →";
-        }
+        btn.innerHTML = (n === pesan.length - 1)
+            ? "Balas di WhatsApp 💬"
+            : "Lanjut →";
     });
 };
 
-/* ===== BUTTON BACK ===== */
 back.onclick = () => {
     if (sedangMengetik || n <= 0) return;
     n--;
@@ -246,7 +237,6 @@ back.onclick = () => {
     btn.innerHTML = "Lanjut →";
 };
 
-/* ===== HEART EFFECT ===== */
 setInterval(() => {
     const h = document.createElement("div");
     h.className = "heart";
